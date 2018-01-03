@@ -1,0 +1,26 @@
+- hosts: "test"
+  become: yes
+  vars:
+    local_test_vm_base_backend_port: 19000
+  roles:
+    - dans.local-test-vm-base
+
+- hosts: "test"
+  become: yes
+  tasks:
+  - name: Install Java
+    yum:
+      name: "java-1.8.0-openjdk"
+      state: latest
+
+  - name: Setup Httpd
+    include_role:
+      name: httpd
+
+  - name: Setup ELK stack
+    include_role:
+      name: elastic
+
+  - name: Write "I'm done"
+    debug:
+      msg: "I'm done"

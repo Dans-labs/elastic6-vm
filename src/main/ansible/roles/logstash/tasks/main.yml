@@ -1,0 +1,49 @@
+- name: Install Logstash
+  yum:
+    name: logstash-6.0.1
+    state: latest
+
+- name: Install nc (for testing with multiple pipelines over tcp)
+  yum:
+    name: nc
+    state: latest
+
+- name: Reload configuration automatically
+  replace:
+    path: /etc/logstash/logstash.yml
+    regexp: "# config.reload.automatic: false"
+    replace: "config.reload.automatic: true"
+
+- name: Configure pipelines
+  copy:
+    src: "{{ item }}"
+    dest: "/etc/logstash/conf.d/{{ item }}"
+  with_items:
+      - logstash-file2elasticsearch.conf
+      - logstash-tcp2file.conf
+
+- name: Pipeline configuration
+  copy:
+    src: pipelines.yml
+    dest: /etc/logstash/pipelines.yml
+
+- name: Disable path to pipeline configurations
+  replace:
+    path: /etc/logstash/logstash.yml
+    regexp: "path.config: /etc/logstash/conf.d/*.conf"
+    replace: "# path.config: /etc/logstash/conf.d/*.conf"
+
+- name: Start Logstash
+  service:
+    name: logstash
+    state: started
+    enabled: yes
+
+- name: Create test files log
+  file:
+    path: "{{ item }}"
+    state: touch
+    mode: 0777
+  with_items:
+      - /var/log/test-input.log
+      - /var/log/test-output.log

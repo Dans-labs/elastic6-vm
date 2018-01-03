@@ -1,0 +1,4 @@
+- pipeline.id: file2elasticsearch
+  path.config: /etc/logstash/conf.d/logstash.conf
+- pipeline.id: tcp2file
+  path.config: /etc/logstash/conf.d/logstash2.conf

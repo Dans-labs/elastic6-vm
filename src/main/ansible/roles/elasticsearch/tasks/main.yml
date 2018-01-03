@@ -1,0 +1,30 @@
+- name: Install ElasticSearch
+  yum:
+    name: elasticsearch-6.0.1
+    state: latest
+
+- name: Create folder for ElasticSearch log
+  file:
+    path: /var/log/elasticsearch
+    state: directory
+    mode: 0777
+
+- name: Create ElasticSearch log
+  file:
+    path: /var/log/elasticsearch/elasticsearch.log
+    state: touch
+    mode: 0777
+
+- name: Reload systemd
+  become: yes
+  command: systemctl daemon-reload
+
+- name: Enable elasticsearch.service
+  become: yes
+  command: systemctl enable elasticsearch.service
+
+- name: Start ElasticSearch
+  service:
+    name: elasticsearch
+    state: started
+    enabled: yes
